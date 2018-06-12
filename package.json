@@ -1,0 +1,15 @@
+{
+  "name": "ssydtomp3",
+  "version": "1.0.0",
+  "description": "Download ant tag tracks or playlists from Soundcloud, Spotify, Youtube or Deezer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o ./youtube-dl && chmod a+rx ./youtube-dl"
+  },
+  "dependencies": {
+    "browser-id3-writer": "4.0.0"
+  },
+  "author": "Guisch",
+  "license": "ISC"
+}
