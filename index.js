@@ -467,7 +467,10 @@ function findMusicInVideoDesc(youtubeId, callback) {
     if (regex.test(res)) {
       var title = titleRegex.exec(res);
       var artist = artistRegex.exec(res);
-      return callback(null, [artist[2] ? artist[2] : artist[1], title[2] ? title[2] : title[1]]);
+      if (title && artist)
+        return callback(null, [artist[2] ? artist[2] : artist[1], title[2] ? title[2] : title[1]]);
+      else
+        return callback(null, null);
     } else
       return callback(null, null);
   });
