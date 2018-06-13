@@ -643,7 +643,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   var coverUrl;
   var coverPath;
 
-  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard') || getJson(metaData, 'soundcloudRes.artwork_url') || getJson(metaData, 'spotifyRes.album.images.0.url');
+  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url') || getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url');
 
   // Ugly but speed up process
   downloadCover(coverUrl, function(res) {
