@@ -651,7 +651,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
   if (!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) {
     if (metaData.youtubeRes) {
-      var guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.snippet.title);
+      var guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.youtubeRes.snippet.title);
 
       info.artistName = guessed[0];
       info.title = guessed[1];
