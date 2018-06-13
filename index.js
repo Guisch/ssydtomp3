@@ -12,7 +12,7 @@ var spotifyAPIKey = 'MTcxYjNkMTZhMTgzNGQ0YWE2MWRjMzM0YTkxZmVlOGU6Yzg2MGNlOWI2YTk
 var spotifyAPIToken;
 var spotifyAPITokenExpire;
 
-var ytdlbin = path.join(__dirname, './youtube-dl');
+var ytdlbin = path.join(__dirname, 'youtube-dl');
 
 // Find info
 
@@ -605,8 +605,11 @@ function downloadUrl(url, filePath) {
   });
 
   ytm.stderr.on('data', function(data) {
-    downloadEmitter.emit('error', data.toString());
-    console.log('Error when downloading', url, ':', data.toString());
+    data = data.toString();
+    if (!data.startsWith('WARNING')) {
+      downloadEmitter.emit('error', );
+      console.log('Error when downloading', url, ':', data);
+    }
   });
 
   ytm.on('exit', function(code) {
