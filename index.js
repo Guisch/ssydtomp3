@@ -632,6 +632,10 @@ function downloadCover(url, callback) {
     response.on('end', function() {
       callback(coverPath);
     });
+
+    response.on('error', function(e) {
+      console.log(e);
+    })
   });
 }
 
