@@ -3,7 +3,7 @@ var ssyd = require('./index');
 var urlSc = 'https://soundcloud.com/ben-klock/ben-klock-subzero-original-mix';
 var urlYt = 'https://www.youtube.com/watch?v=wQDxGKsrgSc';
 var urlSt = 'https://open.spotify.com/track/3yndKI4zWEyC36BQYrdKBA';
-var urlDz = 'https://www.deezer.com/track/61424044?utm_source=deezer&utm_content=track-61424044&utm_term=8830841_1528498835&utm_medium=web';
+var urlDz = 'https://www.deezer.com/track/61424044';
 
 var urlYtPl = 'https://www.youtube.com/playlist?list=PLbhQKJTW_r3grUKrIkKrnDDPxFTe75_oO';
 var urlScPl = 'https://soundcloud.com/anisketsui/sets/technos-moons';
