@@ -755,7 +755,7 @@ function tagFile(filePath, coverPath, info, callback) {
 
   const taggedSongBuffer = Buffer.from(writer.arrayBuffer);
   fs.writeFileSync(filePath, taggedSongBuffer);
-  callback(null, filePath);
+  callback(null, filePath, info);
 }
 
 //
