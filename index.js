@@ -12,7 +12,7 @@ var spotifyAPIKey = 'MTcxYjNkMTZhMTgzNGQ0YWE2MWRjMzM0YTkxZmVlOGU6Yzg2MGNlOWI2YTk
 var spotifyAPIToken;
 var spotifyAPITokenExpire;
 
-var ytdlbin = './youtube-dl';
+var ytdlbin = path.join(__dirname, './youtube-dl');
 
 // Find info
 
