@@ -47,7 +47,11 @@ var findYoutube = function(query, callback) {
   };
 
   call(youtubeOptions, function(err, res) {
-    callback(err, JSON.parse(res));
+    try {
+      callback(err, JSON.parse(res));
+    } catch (e) {
+      callback(e);
+    }
   });
 }
 
@@ -60,7 +64,11 @@ var getYoutubeVideoInfo = function(youtubeId, callback) {
   };
 
   call(youtubeOptions, function(err, res) {
-    callback(err, JSON.parse(res));
+    try {
+      callback(err, JSON.parse(res));
+    } catch (e) {
+      callback(e);
+    }
   });
 }
 
@@ -85,16 +93,19 @@ var getYoutubePlaylist = function(url, callback, prevRes) {
     if (err)
       return callback(err);
 
-    res = JSON.parse(res);
+    try {
+      res = JSON.parse(res);
 
-    if (prevRes)
-      res.items = prevRes.items.concat(res.items);
+      if (prevRes)
+        res.items = prevRes.items.concat(res.items);
 
-    if (res.nextPageToken)
-      return getYoutubePlaylist(url, callback, res);
+      if (res.nextPageToken)
+        return getYoutubePlaylist(url, callback, res);
 
-    //TODO retour
-    callback(err, res.items);
+      callback(null, res.items);
+    } catch (e) {
+      callback(e);
+    }
   });
 }
 
@@ -110,19 +121,23 @@ var getSoundcloudPlaylist = function(url, callback) {
     if (err)
       return callback(err);
 
-    soundcloudOptions = {
-      host: 'api.soundcloud.com',
-      port: 443,
-      path: JSON.parse(res).location.substr(26),
-      method: 'GET'
-    };
+    try {
+      soundcloudOptions = {
+        host: 'api.soundcloud.com',
+        port: 443,
+        path: JSON.parse(res).location.substr(26),
+        method: 'GET'
+      };
 
-    call(soundcloudOptions, function(err, res) {
-      if (err)
-        return callback(err);
+      call(soundcloudOptions, function(err, res) {
+        if (err)
+          return callback(err);
 
-      callback(null, JSON.parse(res).tracks);
-    });
+        callback(null, JSON.parse(res).tracks);
+      });
+    } catch (e) {
+      callback(e);
+    }
   });
 }
 
@@ -151,7 +166,11 @@ var getSpotifyPlaylist = function(url, callback) {
       if (err)
         return callback(err);
 
-      callback(null, JSON.parse(res).items);
+      try {
+        callback(null, JSON.parse(res).items);
+      } catch (e) {
+        callback(e);
+      }
     });
   });
 }
@@ -173,7 +192,11 @@ var getDeezerPlaylist = function(url, callback) {
     if (err)
       return callback(err);
 
-    callback(err, JSON.parse(res).tracks.data);
+    try {
+      callback(err, JSON.parse(res).tracks.data);
+    } catch (e) {
+      callback(e);
+    }
   });
 }
 
@@ -191,14 +214,18 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
     if (err2)
       return callback(err2);
 
-    res2 = typeof(res2) === 'string' ? JSON.parse(res2) : res2;
-    var guessed = guessInfoFromTitle(res2.user.username, res2.title);
+    try {
+      res2 = typeof(res2) === 'string' ? JSON.parse(res2) : res2;
+      var guessed = guessInfoFromTitle(res2.user.username, res2.title);
 
-    findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err3, res3) {
-      res3.soundcloudRes = res2;
+      findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err3, res3) {
+        res3.soundcloudRes = res2;
 
-      callback(err3, res3);
-    });
+        callback(err3, res3);
+      });
+    } catch (e) {
+      callback(e);
+    }
   }
 
   if (scInfo)
@@ -208,14 +235,18 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
       if (err)
         return callback(err);
 
-      soundcloudOptions = {
-        host: 'api.soundcloud.com',
-        port: 443,
-        path: JSON.parse(res).location.substr(26),
-        method: 'GET'
-      }
+      try {
+        soundcloudOptions = {
+          host: 'api.soundcloud.com',
+          port: 443,
+          path: JSON.parse(res).location.substr(26),
+          method: 'GET'
+        }
 
-      call(soundcloudOptions, callbackFunction);
+        call(soundcloudOptions, callbackFunction);
+      } catch (e) {
+        callback(e);
+      }
     });
 }
 
@@ -230,17 +261,22 @@ var getSpotifyMusicInfos = function(url, callback, stInfo) {
   function callbackFunction(err, res) {
     if (err)
       return callback(err);
-    res = typeof(res) === 'string' ? JSON.parse(res) : res;
-    findYoutube(res.artists[0].name + ' - ' + res.name, function(err2, res2) {
-      if (err2)
-        return callback(err2);
 
-      var res3 = {};
-      res3.youtubeRes = res2.items[0];
-      res3.spotifyRes = res;
+    try {
+      res = typeof(res) === 'string' ? JSON.parse(res) : res;
+      findYoutube(res.artists[0].name + ' - ' + res.name, function(err2, res2) {
+        if (err2)
+          return callback(err2);
 
-      callback(null, res3);
-    });
+        var res3 = {};
+        res3.youtubeRes = res2.items[0];
+        res3.spotifyRes = res;
+
+        callback(null, res3);
+      });
+    } catch (e) {
+      callback(e);
+    }
   }
 
   if (stInfo)
@@ -307,17 +343,21 @@ var getDeezerMusicInfos = function(url, callback, dzInfo) {
     if (err)
       return callback(err);
 
-    res = typeof(res) === 'string' ? JSON.parse(res) : res;
-    findYoutube(res.artist.name + ' - ' + res.title, function(err2, res2) {
-      if (err2)
-        return callback(err2);
+    try {
+      res = typeof(res) === 'string' ? JSON.parse(res) : res;
+      findYoutube(res.artist.name + ' - ' + res.title, function(err2, res2) {
+        if (err2)
+          return callback(err2);
 
-      var res3 = {};
-      res3.youtubeRes = res2.items[0];
-      res3.deezerRes = res;
+        var res3 = {};
+        res3.youtubeRes = res2.items[0];
+        res3.deezerRes = res;
 
-      callback(null, res3);
-    });
+        callback(null, res3);
+      });
+    } catch (e) {
+      callback(e);
+    }
   }
 
   if (dzInfo) {
@@ -347,7 +387,11 @@ function callAsync(options) {
         body += chunk;
       });
       res.on('end', function() {
-        return resolve(JSON.parse(body));
+        try {
+          return resolve(JSON.parse(body));
+        } catch (e) {
+          return reject(e);
+        }
       });
     });
 
@@ -558,10 +602,14 @@ function getSpotifyToken(callback) {
       if (err)
         return callback(err);
 
-      res = JSON.parse(res);
-      spotifyAPIToken = res.access_token;
-      spotifyAPITokenExpire = Date.now() + (res.expires_in * 1000);
-      callback();
+      try {
+        res = JSON.parse(res);
+        spotifyAPIToken = res.access_token;
+        spotifyAPITokenExpire = Date.now() + (res.expires_in * 1000);
+        callback();
+      } catch (e) {
+        return callback(e);
+      }
     }, postData);
   } else
     return callback();
