@@ -347,6 +347,7 @@ function callAsync(options) {
         body += chunk;
       });
       res.on('end', function() {
+        console.log(body, '\n\n\n\n\n\n\n');
         return resolve(JSON.parse(body));
       });
     });
