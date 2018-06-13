@@ -347,7 +347,6 @@ function callAsync(options) {
         body += chunk;
       });
       res.on('end', function() {
-        console.log(body, '\n\n\n\n\n\n\n');
         return resolve(JSON.parse(body));
       });
     });
@@ -647,7 +646,9 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   var coverUrl;
   var coverPath;
 
-  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url') || getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url');
+  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url')
+      || getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url')
+      || getJson(metaData, 'youtubeRes.snippet.thumbnails.high.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.default.url');
 
   // Ugly but speed up process
   downloadCover(coverUrl, function(res) {
