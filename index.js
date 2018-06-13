@@ -698,8 +698,9 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
     info.spotifyAlbumId = getJson(metaData, 'spotifyRes.album.id');
   }
 
-  var filePath = path.join(dlPath, info.artistName + ' - ' + (info.trackPosition === undefined ? '' : info.trackPosition.toString() + ' - ') + info.title + '.mp3');
-  filePath = filePath.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, '_');
+  var fileName = info.artistName + ' - ' + (info.trackPosition === undefined ? '' : info.trackPosition.toString() + ' - ') + info.title;
+  fileName = fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 \-]/gi, '_');
+  var filePath = path.join(dlPath, fileName + '.mp3');
 
   var dl = downloadUrl(url, filePath);
 
