@@ -699,7 +699,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   }
 
   var fileName = info.artistName + ' - ' + (info.trackPosition === undefined ? '' : info.trackPosition.toString() + ' - ') + info.title;
-  fileName = fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 \-]/gi, '_');
+  fileName = fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 \-\(\)]/gi, '_');
   var filePath = path.join(dlPath, fileName + '.mp3');
 
   var dl = downloadUrl(url, filePath);
