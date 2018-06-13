@@ -299,7 +299,7 @@ var getYoutubeMusicInfos = function(url, callback, videoInfo) {
 }
 
 var getDeezerMusicInfos = function(url, callback, dzInfo) {
-  var deezerIdRegex = /deezer\.com\/track\/(\d{8})/i;
+  var deezerIdRegex = /deezer\.com\/track\/(\d{5,10})/i;
   if (!deezerIdRegex.test(url))
     return callback('Cannot find deezerId');
 
