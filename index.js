@@ -394,19 +394,23 @@ var findSongFromQuery = async function(query, callback) {
   var allResults = await Promise.all([deezerRes, itunesRes]);
   var info = {};
 
-  info.deezerRes = allResults[0].data[0];
-  for (var i = 1; i < allResults[0].data.length; i++) {
-    if ((allResults[0].data[i].artist.name + ' - ' + allResults[0].data[i].title).toUpperCase() === query.toUpperCase()) {
-      info.deezerRes = allResults[0].data[i];
-      break;
+  if (allResults[0].data) {
+    info.deezerRes = allResults[0].data[0];
+    for (var i = 1; i < allResults[0].data.length; i++) {
+      if ((allResults[0].data[i].artist.name + ' - ' + allResults[0].data[i].title).toUpperCase() === query.toUpperCase()) {
+        info.deezerRes = allResults[0].data[i];
+        break;
+      }
     }
   }
 
-  info.ituneRes = allResults[1].results[0];
-  for (var i = 1; i < allResults[1].results.length; i++) {
-    if ((allResults[1].results[i].artistName + ' - ' + allResults[1].results[i].trackName).toUpperCase() === query.toUpperCase()) {
-      info.ituneRes = allResults[1].results[i];
-      break;
+  if (allResults[1].results) {
+    info.ituneRes = allResults[1].results[0];
+    for (var i = 1; i < allResults[1].results.length; i++) {
+      if ((allResults[1].results[i].artistName + ' - ' + allResults[1].results[i].trackName).toUpperCase() === query.toUpperCase()) {
+        info.ituneRes = allResults[1].results[i];
+        break;
+      }
     }
   }
 
@@ -646,9 +650,9 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   var coverUrl;
   var coverPath;
 
-  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url')
-      || getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url')
-      || getJson(metaData, 'youtubeRes.snippet.thumbnails.high.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.default.url');
+  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url') ||
+    getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url') ||
+    getJson(metaData, 'youtubeRes.snippet.thumbnails.high.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.default.url');
 
   // Ugly but speed up process
   downloadCover(coverUrl, function(res) {
