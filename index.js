@@ -14,6 +14,13 @@ var spotifyAPITokenExpire;
 
 var ytdlbin = path.join(__dirname, 'youtube-dl');
 
+const youtubeIdRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+const youtubePlaylistRegex = /youtube\.com\/playlist\?list=(.{10,35})/i;
+const deezerTrackIdRegex = /deezer\.com\/track\/(\d{5,10})/i;
+const deezerPlaylistIdRegex = /deezer\.com\/.?.?\/?playlist\/(\d{5,15})/i;
+const spotifyTrackIdRegex = /(spotify:track:|open\.spotify\.com\/track\/)(\w{22})/i;
+const spotifyPlaylistIdRegex = /(spotify:user:|open\.spotify\.com\/user\/)(.*)(\/|:)playlist(\/|:)(\w{22})/i;
+
 // Find info
 
 var findItune = function(query) {
@@ -67,7 +74,6 @@ var getYoutubeVideoInfo = function(youtubeId, callback) {
 // Playlist
 
 var getYoutubePlaylist = function(url, callback, prevRes) {
-  const youtubePlaylistRegex = /youtube\.com\/playlist\?list=(.{10,35})/i;
 
   if (!youtubePlaylistRegex.test(url))
     callback('Cannot find youtubePlaylistId');
@@ -127,13 +133,12 @@ var getSoundcloudPlaylist = function(url, callback) {
 }
 
 var getSpotifyPlaylist = function(url, callback) {
-  const spotifyIdRegex = /(spotify:user:|open\.spotify\.com\/user\/)(.*)(\/|:)playlist(\/|:)(\w{22})/i;
 
-  if (!spotifyIdRegex.test(url))
+  if (!spotifyPlaylistIdRegex.test(url))
     return callback('Cannot find spotifyId');
 
   getSpotifyToken(function() {
-    var temp = spotifyIdRegex.exec(url);
+    var temp = spotifyPlaylistIdRegex.exec(url);
     var userId = temp[2];
     var playlistId = temp[5];
 
@@ -157,11 +162,10 @@ var getSpotifyPlaylist = function(url, callback) {
 }
 
 var getDeezerPlaylist = function(url, callback) {
-  var deezerIdRegex = /deezer\.com\/playlist\/(\d{10})/i;
-  if (!deezerIdRegex.test(url))
+  if (!deezerPlaylistIdRegex.test(url))
     return callback('Cannot find deezerId');
 
-  var id = deezerIdRegex.exec(url)[1];
+  var id = deezerPlaylistIdRegex.exec(url)[1];
   var deezerOptions = {
     host: 'api.deezer.com',
     port: 443,
@@ -220,12 +224,11 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
 }
 
 var getSpotifyMusicInfos = function(url, callback, stInfo) {
-  const spotifyIdRegex = /(spotify:track:|open\.spotify\.com\/track\/)(\w{22})/i;
 
-  if (!spotifyIdRegex.test(url))
+  if (!spotifyTrackIdRegex.test(url))
     return callback('Cannot find spotifyId');
 
-  var id = spotifyIdRegex.exec(url)[2];
+  var id = spotifyTrackIdRegex.exec(url)[2];
 
   function callbackFunction(err, res) {
     if (err)
@@ -264,7 +267,6 @@ var getSpotifyMusicInfos = function(url, callback, stInfo) {
 
 var getYoutubeMusicInfos = function(url, callback, videoInfo) {
   //Thanks https://stackoverflow.com/questions/6903823/regex-for-youtube-id
-  var youtubeIdRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
   if (!youtubeIdRegex.test(url))
     return callback('Cannot find youtubeID');
 
@@ -299,8 +301,7 @@ var getYoutubeMusicInfos = function(url, callback, videoInfo) {
 }
 
 var getDeezerMusicInfos = function(url, callback, dzInfo) {
-  var deezerIdRegex = /deezer\.com\/track\/(\d{5,10})/i;
-  if (!deezerIdRegex.test(url))
+  if (!deezerTrackIdRegex.test(url))
     return callback('Cannot find deezerId');
 
   function callbackFunction(err, res) {
@@ -323,7 +324,7 @@ var getDeezerMusicInfos = function(url, callback, dzInfo) {
   if (dzInfo) {
     callbackFunction(null, dzInfo);
   } else {
-    var id = deezerIdRegex.exec(url)[1];
+    var id = deezerTrackIdRegex.exec(url)[1];
 
     var deezerOptions = {
       host: 'api.deezer.com',
@@ -614,7 +615,7 @@ function downloadUrl(url, filePath) {
   ytm.stderr.on('data', function(data) {
     data = data.toString();
     if (!data.startsWith('WARNING')) {
-      downloadEmitter.emit('error', );
+      downloadEmitter.emit('error', data);
       console.log('Error when downloading', url, ':', data);
     }
   });
@@ -778,6 +779,27 @@ function tagFile(filePath, coverPath, info, callback) {
 
 //
 
+var sanitizeUrl = function(url) {
+  if (youtubeIdRegex.test(url))
+    return 'https://www.youtube.com/watch?v=' + youtubeIdRegex.exec(url)[1];
+  if (youtubePlaylistRegex.test(url))
+    return 'https://www.youtube.com/playlist?list=' + youtubePlaylistRegex.exec(url)[1]
+  if (deezerTrackIdRegex.test(url))
+    return 'https://www.deezer.com/track/' + deezerTrackIdRegex.exec(url)[1];
+  if (deezerPlaylistIdRegex.test(url))
+    return 'https://www.deezer.com/playlist/' + deezerPlaylistIdRegex.exec(url)[1];
+  if (spotifyTrackIdRegex.test(url))
+    return 'https://open.spotify.com/track/' + spotifyTrackIdRegex.exec(url)[2];
+  if (spotifyPlaylistIdRegex.test(url)) {
+      var temp = spotifyPlaylistIdRegex.exec(url);
+      var userId = temp[2];
+      var playlistId = temp[5];
+      return 'https://open.spotify.com/user/' + userId + '/playlist/' + playlistId;
+  }
+
+  return url;
+}
+
 exports.findItune = findItune;
 exports.findDeezer = findDeezer;
 exports.findYoutube = findYoutube;
@@ -793,3 +815,4 @@ exports.getDeezerMusicInfos = getDeezerMusicInfos;
 exports.findSongFromQuery = findSongFromQuery;
 exports.findVideoFromQuery = findVideoFromQuery;
 exports.downloadAndTag = downloadAndTag;
+exports.sanitizeUrl = sanitizeUrl;
