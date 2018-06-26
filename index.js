@@ -348,7 +348,13 @@ function callAsync(options) {
         body += chunk;
       });
       res.on('end', function() {
-        return resolve(JSON.parse(body));
+        try {
+          return resolve(JSON.parse(body));
+        } catch (e) {
+          return resolve({
+            results: null
+          });
+        }
       });
     });
 
@@ -395,7 +401,7 @@ var findSongFromQuery = async function(query, callback) {
   var allResults = await Promise.all([deezerRes, itunesRes]);
   var info = {};
 
-  if (allResults[0].data) {
+  if (allResults[0] !== undefined && allResults[0].data) {
     info.deezerRes = allResults[0].data[0];
     for (var i = 1; i < allResults[0].data.length; i++) {
       if ((allResults[0].data[i].artist.name + ' - ' + allResults[0].data[i].title).toUpperCase() === query.toUpperCase()) {
@@ -405,7 +411,7 @@ var findSongFromQuery = async function(query, callback) {
     }
   }
 
-  if (allResults[1].results) {
+  if (allResults[1] !== undefined && allResults[1].results) {
     info.ituneRes = allResults[1].results[0];
     for (var i = 1; i < allResults[1].results.length; i++) {
       if ((allResults[1].results[i].artistName + ' - ' + allResults[1].results[i].trackName).toUpperCase() === query.toUpperCase()) {
@@ -782,19 +788,24 @@ function tagFile(filePath, coverPath, info, callback) {
 var sanitizeUrl = function(url) {
   if (youtubeIdRegex.test(url))
     return 'https://www.youtube.com/watch?v=' + youtubeIdRegex.exec(url)[1];
+
   if (youtubePlaylistRegex.test(url))
-    return 'https://www.youtube.com/playlist?list=' + youtubePlaylistRegex.exec(url)[1]
+    return 'https://www.youtube.com/playlist?list=' + youtubePlaylistRegex.exec(url)[1];
+
   if (deezerTrackIdRegex.test(url))
     return 'https://www.deezer.com/track/' + deezerTrackIdRegex.exec(url)[1];
+
   if (deezerPlaylistIdRegex.test(url))
     return 'https://www.deezer.com/playlist/' + deezerPlaylistIdRegex.exec(url)[1];
+
   if (spotifyTrackIdRegex.test(url))
     return 'https://open.spotify.com/track/' + spotifyTrackIdRegex.exec(url)[2];
+
   if (spotifyPlaylistIdRegex.test(url)) {
-      var temp = spotifyPlaylistIdRegex.exec(url);
-      var userId = temp[2];
-      var playlistId = temp[5];
-      return 'https://open.spotify.com/user/' + userId + '/playlist/' + playlistId;
+    var temp = spotifyPlaylistIdRegex.exec(url);
+    var userId = temp[2];
+    var playlistId = temp[5];
+    return 'https://open.spotify.com/user/' + userId + '/playlist/' + playlistId;
   }
 
   return url;
