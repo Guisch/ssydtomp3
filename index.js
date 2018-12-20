@@ -661,10 +661,12 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
     getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url') ||
     getJson(metaData, 'youtubeRes.snippet.thumbnails.high.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.default.url');
 
-  // Ugly but speed up process
-  downloadCover(coverUrl, function(res) {
-    coverPath = res;
-  });
+  if (coverUrl) {
+    // Ugly but speed up process
+    downloadCover(coverUrl, function(res) {
+      coverPath = res;
+    });
+  }
 
   var info = {};
 
