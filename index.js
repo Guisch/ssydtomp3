@@ -653,6 +653,40 @@ function downloadCover(url, callback) {
   });
 }
 
+var levenshtein = function(a, b){
+  if(a.length == 0) return b.length; 
+  if(b.length == 0) return a.length; 
+
+  var matrix = [];
+
+  // increment along the first column of each row
+  var i;
+  for(i = 0; i <= b.length; i++){
+    matrix[i] = [i];
+  }
+
+  // increment each column in the first row
+  var j;
+  for(j = 0; j <= a.length; j++){
+    matrix[0][j] = j;
+  }
+
+  // Fill in the rest of the matrix
+  for(i = 1; i <= b.length; i++){
+    for(j = 1; j <= a.length; j++){
+      if(b.charAt(i-1) == a.charAt(j-1)){
+        matrix[i][j] = matrix[i-1][j-1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
+                                Math.min(matrix[i][j-1] + 1, // insertion
+                                         matrix[i-1][j] + 1)); // deletion
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
 var downloadAndTag = function(url, dlPath, metaData, callback) {
   var coverUrl;
   var coverPath;
@@ -669,18 +703,20 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   }
 
   var info = {};
+  var artistNameFound = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
+  var guessed;
+  if (metaData.youtubeRes)
+    guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.youtubeRes.snippet.title);
+  else if (metaData.soundcloudRes)
+    guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
 
   info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
-  if (!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) {
+  if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && lenvenshtein(guessed[0], artistNameFound || "") > 15 ) {
     if (metaData.youtubeRes) {
-      var guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.youtubeRes.snippet.title);
-
       info.artistName = guessed[0];
       info.title = guessed[1];
       info.cover = coverUrl;
     } else if (metaData.soundcloudRes) {
-      var guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
-
       info.tags = getJson(metaData, 'soundcloudRes.tag_list').split(' ');
       info.artistName = guessed[0];
       info.title = guessed[1];
@@ -693,7 +729,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
       info.songDurationMs = getJson(metaData, 'soundcloudRes.duration');
     }
   } else {
-    info.title = getJson(metaData, 'deezerRes.title') || getJson(metaData, 'ituneRes.trackName') || getJson(metaData, 'spotifyRes.name');
+    info.title = artistNameFound;
     info.genre = getJson(metaData, 'ituneRes.primaryGenreName');
     info.artistName = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
     info.albumName = getJson(metaData, 'deezerRes.album.title') || getJson(metaData, 'ituneRes.collectionName') || getJson(metaData, 'spotifyRes.album.name');
