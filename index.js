@@ -729,9 +729,9 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
       info.songDurationMs = getJson(metaData, 'soundcloudRes.duration');
     }
   } else {
-    info.title = artistNameFound;
+    info.title = getJson(metaData, 'deezerRes.title') || getJson(metaData, 'ituneRes.trackName') || getJson(metaData, 'spotifyRes.name');
     info.genre = getJson(metaData, 'ituneRes.primaryGenreName');
-    info.artistName = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
+    info.artistName = artistNameFound;
     info.albumName = getJson(metaData, 'deezerRes.album.title') || getJson(metaData, 'ituneRes.collectionName') || getJson(metaData, 'spotifyRes.album.name');
     info.trackPosition = getJson(metaData, 'ituneRes.trackNumber') || getJson(metaData, 'spotifyRes.track_number');
     info.trackCount = getJson(metaData, 'ituneRes.trackCount');
