@@ -711,7 +711,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
     guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
 
   info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
-  if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && lenvenshtein(guessed[0], artistNameFound || "") > 15 ) {
+  if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && lenvenshtein(guessed[0], artistNameFound || "") > 15 )) {
     if (metaData.youtubeRes) {
       info.artistName = guessed[0];
       info.title = guessed[1];
