@@ -703,7 +703,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
   }
 
   var info = {};
-  var artistNameFound = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
+  var titleFound = getJson(metaData, 'deezerRes.title') || getJson(metaData, 'ituneRes.trackName') || getJson(metaData, 'spotifyRes.name');
   var guessed;
   if (metaData.youtubeRes)
     guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.youtubeRes.snippet.title);
@@ -711,7 +711,7 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
     guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
 
   info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
-  if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && levenshtein(guessed[0], artistNameFound || "") > 15 )) {
+  if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && levenshtein(guessed[1], titleFound || "") > 15 )) {
     if (metaData.youtubeRes) {
       info.artistName = guessed[0];
       info.title = guessed[1];
@@ -729,9 +729,9 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
       info.songDurationMs = getJson(metaData, 'soundcloudRes.duration');
     }
   } else {
-    info.title = getJson(metaData, 'deezerRes.title') || getJson(metaData, 'ituneRes.trackName') || getJson(metaData, 'spotifyRes.name');
+    info.title = titleFound;
     info.genre = getJson(metaData, 'ituneRes.primaryGenreName');
-    info.artistName = artistNameFound;
+    info.artistName = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
     info.albumName = getJson(metaData, 'deezerRes.album.title') || getJson(metaData, 'ituneRes.collectionName') || getJson(metaData, 'spotifyRes.album.name');
     info.trackPosition = getJson(metaData, 'ituneRes.trackNumber') || getJson(metaData, 'spotifyRes.track_number');
     info.trackCount = getJson(metaData, 'ituneRes.trackCount');
