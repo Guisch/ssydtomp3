@@ -688,85 +688,90 @@ function levenshtein(a, b){
 }
 
 var downloadAndTag = function(url, dlPath, metaData, callback) {
-  var coverUrl;
-  var coverPath;
+  try {
+    var coverUrl;
+    var coverPath;
 
-  coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url') ||
-    getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url') ||
-    getJson(metaData, 'youtubeRes.snippet.thumbnails.high.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.default.url');
+    coverUrl = getJson(metaData, 'deezerRes.album.cover_big') || getJson(metaData, 'ituneRes.artworkUrl100') || getJson(metaData, 'soundcloudRes.artwork_url') ||
+      getJson(metaData, 'spotifyRes.album.images.0.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.standard.url') ||
+      getJson(metaData, 'youtubeRes.snippet.thumbnails.high.url') || getJson(metaData, 'youtubeRes.snippet.thumbnails.default.url');
 
-  if (coverUrl) {
-    // Ugly but speed up process
-    downloadCover(coverUrl, function(res) {
-      coverPath = res;
-    });
-  }
-
-  var info = {};
-  var titleFound = getJson(metaData, 'deezerRes.title') || getJson(metaData, 'ituneRes.trackName') || getJson(metaData, 'spotifyRes.name');
-  var guessed;
-  if (metaData.youtubeRes)
-    guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.youtubeRes.snippet.title);
-  else if (metaData.soundcloudRes)
-    guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
-
-  info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
-  if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && levenshtein(guessed[1], titleFound || "") > 15 )) {
-    if (metaData.youtubeRes) {
-      info.artistName = guessed[0];
-      info.title = guessed[1];
-      info.cover = coverUrl;
-    } else if (metaData.soundcloudRes) {
-      info.tags = getJson(metaData, 'soundcloudRes.tag_list').split(' ');
-      info.artistName = guessed[0];
-      info.title = guessed[1];
-      info.cover = coverUrl;
-      info.genre = getJson(metaData, 'soundcloudRes.genre');
-      var releaseYear = getJson(metaData, 'soundcloudRes.release_year');
-      if (releaseYear)
-        info.releaseYear = parseInt(releaseYear);
-      info.trackWebpage = getJson(metaData, 'soundcloudRes.permalink_url');
-      info.songDurationMs = getJson(metaData, 'soundcloudRes.duration');
+    if (coverUrl) {
+      // Ugly but speed up process
+      downloadCover(coverUrl, function(res) {
+        coverPath = res;
+      });
     }
-  } else {
-    info.title = titleFound;
-    info.genre = getJson(metaData, 'ituneRes.primaryGenreName');
-    info.artistName = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
-    info.albumName = getJson(metaData, 'deezerRes.album.title') || getJson(metaData, 'ituneRes.collectionName') || getJson(metaData, 'spotifyRes.album.name');
-    info.trackPosition = getJson(metaData, 'ituneRes.trackNumber') || getJson(metaData, 'spotifyRes.track_number');
-    info.trackCount = getJson(metaData, 'ituneRes.trackCount');
-    info.discCount = getJson(metaData, 'ituneRes.discCount') || getJson(metaData, 'spotifyRes.disc_number');
-    info.discPosition = getJson(metaData, 'ituneRes.discPosition');
-    info.trackWebpage = getJson(metaData, 'deezerRes.link') || getJson(metaData, 'ituneRes.trackViewUrl') || getJson(metaData, 'spotifyRes.external_urls.spotify');
-    info.artistWebpage = getJson(metaData, 'deezerRes.artist.link') || getJson(metaData, 'ituneRes.artistViewUrl') || getJson(metaData, 'spotifyRes.artists.0.external_urls.spotify');
-    info.songDurationMs = getJson(metaData, 'ituneRes.trackTimeMillis') || (getJson(metaData, 'deezerRes.duration') * 1000) || getJson(metaData, 'spotifyRes.duration_ms');
-    var releaseDate = getJson(metaData, 'ituneRes.releaseDate') || getJson(metaData, 'spotifyRes.album.release_date');
-    if (releaseDate)
-      info.releaseYear = parseInt(releaseDate.substr(0, 4));
-    info.cover = coverUrl;
-    info.ituneId = getJson(metaData, 'ituneRes.trackId');
-    info.deezerId = getJson(metaData, 'deezerRes.id');
-    info.spotifyId = getJson(metaData, 'spotifyRes.id');
-    info.deezerAlbumId = getJson(metaData, 'deezerRes.album.id');
-    info.ituneAlbumId = getJson(metaData, 'ituneRes.collectionId');
-    info.spotifyAlbumId = getJson(metaData, 'spotifyRes.album.id');
-  }
 
-  var fileName = info.artistName + ' - ' + (info.trackPosition === undefined ? '' : info.trackPosition.toString() + ' - ') + info.title;
-  fileName = fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 \-\(\)]/gi, '_');
-  var filePath = path.join(dlPath, fileName + '.mp3');
+    var info = {};
+    var titleFound = getJson(metaData, 'deezerRes.title') || getJson(metaData, 'ituneRes.trackName') || getJson(metaData, 'spotifyRes.name');
+    var guessed;
+    if (metaData.youtubeRes)
+      guessed = guessInfoFromTitle(metaData.youtubeRes.snippet.channelTitle, metaData.youtubeRes.snippet.title);
+    else if (metaData.soundcloudRes)
+      guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
 
-  var dl = downloadUrl(url, filePath);
+    info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
+    if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && levenshtein(guessed[1], titleFound || "") > 15 )) {
+      if (metaData.youtubeRes) {
+        info.artistName = guessed[0];
+        info.title = guessed[1];
+        info.cover = coverUrl;
+      } else if (metaData.soundcloudRes) {
+        info.tags = getJson(metaData, 'soundcloudRes.tag_list').split(' ');
+        info.artistName = guessed[0];
+        info.title = guessed[1];
+        info.cover = coverUrl;
+        info.genre = getJson(metaData, 'soundcloudRes.genre');
+        var releaseYear = getJson(metaData, 'soundcloudRes.release_year');
+        if (releaseYear)
+          info.releaseYear = parseInt(releaseYear);
+        info.trackWebpage = getJson(metaData, 'soundcloudRes.permalink_url');
+        info.songDurationMs = getJson(metaData, 'soundcloudRes.duration');
+      }
+    } else {
+      info.title = titleFound;
+      info.genre = getJson(metaData, 'ituneRes.primaryGenreName');
+      info.artistName = getJson(metaData, 'deezerRes.artist.name') || getJson(metaData, 'ituneRes.artistName') || getJson(metaData, 'spotifyRes.artists.0.name');
+      info.albumName = getJson(metaData, 'deezerRes.album.title') || getJson(metaData, 'ituneRes.collectionName') || getJson(metaData, 'spotifyRes.album.name');
+      info.trackPosition = getJson(metaData, 'ituneRes.trackNumber') || getJson(metaData, 'spotifyRes.track_number');
+      info.trackCount = getJson(metaData, 'ituneRes.trackCount');
+      info.discCount = getJson(metaData, 'ituneRes.discCount') || getJson(metaData, 'spotifyRes.disc_number');
+      info.discPosition = getJson(metaData, 'ituneRes.discPosition');
+      info.trackWebpage = getJson(metaData, 'deezerRes.link') || getJson(metaData, 'ituneRes.trackViewUrl') || getJson(metaData, 'spotifyRes.external_urls.spotify');
+      info.artistWebpage = getJson(metaData, 'deezerRes.artist.link') || getJson(metaData, 'ituneRes.artistViewUrl') || getJson(metaData, 'spotifyRes.artists.0.external_urls.spotify');
+      info.songDurationMs = getJson(metaData, 'ituneRes.trackTimeMillis') || (getJson(metaData, 'deezerRes.duration') * 1000) || getJson(metaData, 'spotifyRes.duration_ms');
+      var releaseDate = getJson(metaData, 'ituneRes.releaseDate') || getJson(metaData, 'spotifyRes.album.release_date');
+      if (releaseDate)
+        info.releaseYear = parseInt(releaseDate.substr(0, 4));
+      info.cover = coverUrl;
+      info.ituneId = getJson(metaData, 'ituneRes.trackId');
+      info.deezerId = getJson(metaData, 'deezerRes.id');
+      info.spotifyId = getJson(metaData, 'spotifyRes.id');
+      info.deezerAlbumId = getJson(metaData, 'deezerRes.album.id');
+      info.ituneAlbumId = getJson(metaData, 'ituneRes.collectionId');
+      info.spotifyAlbumId = getJson(metaData, 'spotifyRes.album.id');
+    }
 
-  dl.on('end', function() {
-    tagFile(filePath, coverPath, info, callback);
-  });
+    var fileName = info.artistName + ' - ' + (info.trackPosition === undefined ? '' : info.trackPosition.toString() + ' - ') + info.title;
+    fileName = fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 \-\(\)]/gi, '_');
+    var filePath = path.join(dlPath, fileName + '.mp3');
 
-  dl.on('error', function(error) {
+    var dl = downloadUrl(url, filePath);
+
+    dl.on('end', function() {
+      tagFile(filePath, coverPath, info, callback);
+    });
+
+    dl.on('error', function(error) {
+      callback(error);
+    });
+
+    return dl;
+  } catch(error) {
     callback(error);
-  });
-
-  return dl;
+    return null;
+  }
 }
 
 //
