@@ -687,6 +687,15 @@ function levenshtein(a, b){
   return matrix[b.length][a.length];
 }
 
+function toTitleCase(str) {
+    return str.replace(
+        /\w\S*/g,
+        function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+}
+
 var downloadAndTag = function(url, dlPath, metaData, callback) {
   try {
     var coverUrl;
@@ -712,15 +721,15 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
       guessed = guessInfoFromTitle(metaData.soundcloudRes.user.username, metaData.soundcloudRes.title);
 
     info.tags = getJson(metaData, 'youtubeRes.snippet.tags');
-    if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && levenshtein(guessed[1], titleFound || "") > 15 )) {
+    if ((!metaData.ituneRes && !metaData.deezerRes && !metaData.spotifyRes) || (guessed !== undefined && levenshtein(guessed[1], titleFound || "") > 10 )) {
       if (metaData.youtubeRes) {
-        info.artistName = guessed[0];
-        info.title = guessed[1];
+        info.artistName = toTitleCase(guessed[0]);
+        info.title = toTitleCase(guessed[1]);
         info.cover = coverUrl;
       } else if (metaData.soundcloudRes) {
         info.tags = getJson(metaData, 'soundcloudRes.tag_list').split(' ');
-        info.artistName = guessed[0];
-        info.title = guessed[1];
+        info.artistName = toTitleCase(guessed[0]);
+        info.title = toTitleCase(guessed[1]);
         info.cover = coverUrl;
         info.genre = getJson(metaData, 'soundcloudRes.genre');
         var releaseYear = getJson(metaData, 'soundcloudRes.release_year');
