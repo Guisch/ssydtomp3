@@ -535,6 +535,8 @@ function guessInfoFromTitle(author, title) {
     return title.split(' | ');
   } else if (/ – /g.test(title)) {
     return title.split(' – ');
+  } else if (/ : /g.test(title)) {
+    return title.split(' – ');
   } else {
     return [author, title];
   }
