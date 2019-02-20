@@ -194,8 +194,13 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
   function callbackFunction(err2, res2) {
     if (err2)
       return callback(err2);
-
-    res2 = typeof(res2) === 'string' ? JSON.parse(res2) : res2;
+    
+    try {
+      res2 = typeof(res2) === 'string' ? JSON.parse(res2) : res2;
+    } catch (e) {
+      return callback(err2);
+    }
+     
     var guessed = guessInfoFromTitle(res2.user.username, res2.title);
 
     findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err3, res3) {
