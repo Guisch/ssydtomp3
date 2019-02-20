@@ -211,11 +211,19 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
     call(soundcloudOptions, function(err, res) {
       if (err)
         return callback(err);
+      
+      var path;
+      
+      try {
+        path = JSON.parse(res).location.substr(26);
+      } catch (e) {
+        return callback(e);
+      }
 
       soundcloudOptions = {
         host: 'api.soundcloud.com',
         port: 443,
-        path: JSON.parse(res).location.substr(26),
+        path: path,
         method: 'GET'
       }
 
