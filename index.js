@@ -604,7 +604,7 @@ function downloadUrl(url, filePath) {
   const dlStartRegex = /\[download\] Destination/;
   const dlEndRegex = /\[download\] 100%/;
 
-  var args = ['--audio-quality', '0', '-x', '--audio-format', 'mp3']
+  var args = /soundcloud/i.test(url) ? [] : ['--audio-quality', '0', '-x'];
 
   if (filePath) {
     args.push('-o');
