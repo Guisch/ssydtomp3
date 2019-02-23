@@ -601,14 +601,14 @@ function downloadUrl(url, filePath) {
   const fetchingRegex = /Downloading webpage/;
   const cvStartRegex = /\[ffmpeg\] Correcting container/;
   const cvEndRegex = /Deleting original file/;
-  const dlStartRegex = /\[download\] Destination: (.*)\.(.{3,4})$/;
+  const dlStartRegex = /\[download\] Destination/;
   const dlEndRegex = /\[download\] 100%/;
 
-  var args = /soundcloud/i.test(url) ? [] : ['--audio-quality', '0', '-x'];
+  var args = ['--audio-quality', '0', '-x', '--audio-format', 'mp3']
 
   if (filePath) {
     args.push('-o');
-    args.push(filePath + '.%(ext)s')
+    args.push(filePath.split('.').slice(0, -1).join('.') + '.%(ext)s')
   }
 
   args.push(url);
@@ -627,8 +627,7 @@ function downloadUrl(url, filePath) {
     } else if (cvEndRegex.test(data)) {
       downloadEmitter.emit('convert-end');
     } else if (dlStartRegex.test(data)) {
-      var format = dlStartRegex.exec(data)[2];
-      downloadEmitter.emit('dl-start', format);
+      downloadEmitter.emit('dl-start');
     } else if (dlEndRegex.test(data)) {
       downloadEmitter.emit('dl-end');
     }
@@ -780,13 +779,9 @@ var downloadAndTag = function(url, dlPath, metaData, callback) {
 
     var fileName = info.artistName + ' - ' + (info.trackPosition === undefined ? '' : info.trackPosition.toString() + ' - ') + info.title;
     fileName = fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 \-\(\)]/gi, '_');
-    var filePath = path.join(dlPath, fileName);
+    var filePath = path.join(dlPath, fileName + '.mp3');
 
     var dl = downloadUrl(url, filePath);
-    
-    dl.on('dl-start', function(format) {
-      filePath = `${filePath}.${format}`;
-    });
 
     dl.on('end', function() {
       tagFile(filePath, coverPath, info, callback);
