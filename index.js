@@ -192,7 +192,7 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
   };
 
   function callbackFunction(err2, res2) {
-    if (err2)
+    if (err2 || res2 === undefined)
       return callback(err2);
     
     try {
@@ -214,7 +214,7 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
     callbackFunction(null, scInfo);
   else
     call(soundcloudOptions, function(err, res) {
-      if (err)
+      if (err || res === undefined)
         return callback(err);
       
       var path;
