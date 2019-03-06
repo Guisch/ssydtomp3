@@ -201,7 +201,11 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
       return callback(err2);
     }
      
-    var guessed = guessInfoFromTitle(res2.user.username, res2.title);
+    var guessed;
+    if (res2.user !== undefined && res2.user.username !== undefined)
+      guessed = guessInfoFromTitle(res2.user.username, res2.title);
+    else
+      guessed = guessInfoFromTitle('Unknown artist', res2.title);
 
     findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err3, res3) {
       res3.soundcloudRes = res2;
