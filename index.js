@@ -200,7 +200,10 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
     } catch (e) {
       return callback(err2);
     }
-     
+    
+    if (res2.kind !== 'track')
+      return callback('Not a track');    
+    
     var guessed;
     if (res2.user !== undefined && res2.user.username !== undefined)
       guessed = guessInfoFromTitle(res2.user.username, res2.title);
