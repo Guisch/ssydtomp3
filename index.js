@@ -889,8 +889,13 @@ var sanitizeUrl = function(url) {
     var playlistId = temp[5];
     return 'https://open.spotify.com/user/' + userId + '/playlist/' + playlistId;
   }
+  
+  if (/http:\/\//i.test(url))
+    return url.replace('http://', 'https://');
+  if (/https:\/\//i.test(url))
+    return url;
 
-  return url;
+  return `https://${url}`
 }
 
 exports.findItune = findItune;
