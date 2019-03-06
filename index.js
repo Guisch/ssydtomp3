@@ -379,8 +379,8 @@ function callAsync(options) {
     });
 
     req.on('error', function(e) {
-      return reject(e);
       console.log('Problem with request: ' + e.message);
+      return reject(e);
     });
 
     // write data to request body
@@ -415,10 +415,14 @@ function call(options, callback, postData) {
 //
 
 var findSongFromQuery = async function(query, callback) {
-  var deezerRes = findDeezer(query);
-  var itunesRes = findItune(query);
-
-  var allResults = await Promise.all([deezerRes, itunesRes]);
+  try {
+    var deezerRes = findDeezer(query);
+    var itunesRes = findItune(query);
+    var allResults = await Promise.all([deezerRes, itunesRes]);
+  } catch(err) {
+    console.log(err)
+    return callback(err);
+  }
   var info = {};
 
   if (allResults[0] !== undefined && allResults[0].data) {
@@ -843,12 +847,16 @@ function tagFile(filePath, coverPath, info, callback) {
     writer.setFrame('TYER', parseInt(info.releaseYear));
   if (coverPath) {
     const coverBuffer = fs.readFileSync(coverPath);
-
-    writer.setFrame('APIC', {
-      type: 3,
-      data: coverBuffer,
-      description: 'Dubbatransitek'
-    });
+    
+    try {
+      writer.setFrame('APIC', {
+        type: 3,
+        data: coverBuffer,
+        description: 'Dubbatransitek'
+      });
+    } catch(err) {
+      console.log("Incorect MIME Type, ignoring cover");
+    }
   }
   writer.addTag();
 
