@@ -194,16 +194,16 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
   function callbackFunction(err2, res2) {
     if (err2 || res2 === undefined)
       return callback(err2);
-    
+
     try {
       res2 = typeof(res2) === 'string' ? JSON.parse(res2) : res2;
     } catch (e) {
       return callback(err2);
     }
-    
+
     if (res2.kind !== 'track')
-      return callback('Not a track');    
-    
+      return callback('Not a track');
+
     var guessed;
     if (res2.user !== undefined && res2.user.username !== undefined)
       guessed = guessInfoFromTitle(res2.user.username, res2.title);
@@ -211,6 +211,9 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
       guessed = guessInfoFromTitle('Unknown artist', res2.title);
 
     findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err3, res3) {
+      if (err3 || res3 === undefined)
+        return callback(err3);
+
       res3.soundcloudRes = res2;
 
       callback(err3, res3);
@@ -223,9 +226,9 @@ var getSoundcloudInfos = function(url, callback, scInfo) {
     call(soundcloudOptions, function(err, res) {
       if (err || res === undefined)
         return callback(err);
-      
+
       var path;
-      
+
       try {
         path = JSON.parse(res).location.substr(26);
       } catch (e) {
@@ -307,7 +310,7 @@ var getYoutubeMusicInfos = function(url, callback, videoInfo) {
       return findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err, res3) {
         if (err || res3 === undefined)
           return callback(err);
-        
+
         res3.youtubeRes = res.items[0];
         if (!getJson(res3, 'youtubeRes.id.videoId'))
           res3.youtubeRes.id = getJson(res3, 'youtubeRes.contentDetails');
@@ -683,8 +686,8 @@ function downloadCover(url, callback) {
 }
 
 function levenshtein(a, b){
-  if(a.length == 0) return b.length; 
-  if(b.length == 0) return a.length; 
+  if(a.length == 0) return b.length;
+  if(b.length == 0) return a.length;
 
   var matrix = [];
 
@@ -850,7 +853,7 @@ function tagFile(filePath, coverPath, info, callback) {
     writer.setFrame('TYER', parseInt(info.releaseYear));
   if (coverPath) {
     const coverBuffer = fs.readFileSync(coverPath);
-    
+
     try {
       writer.setFrame('APIC', {
         type: 3,
@@ -892,7 +895,7 @@ var sanitizeUrl = function(url) {
     var playlistId = temp[5];
     return 'https://open.spotify.com/user/' + userId + '/playlist/' + playlistId;
   }
-  
+
   if (/http:\/\//i.test(url))
     return url.replace('http://', 'https://');
   if (/https:\/\//i.test(url))
