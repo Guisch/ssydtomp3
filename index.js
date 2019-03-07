@@ -305,6 +305,9 @@ var getYoutubeMusicInfos = function(url, callback, videoInfo) {
         guessed = guessInfoFromTitle(res.items[0].snippet.channelTitle, res.items[0].snippet.title);
 
       return findSongFromQuery(guessed[0] + ' - ' + guessed[1], function(err, res3) {
+        if (err || res3 === undefined)
+          return callback(err);
+        
         res3.youtubeRes = res.items[0];
         if (!getJson(res3, 'youtubeRes.id.videoId'))
           res3.youtubeRes.id = getJson(res3, 'youtubeRes.contentDetails');
