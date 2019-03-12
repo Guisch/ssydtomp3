@@ -54,7 +54,14 @@ var findYoutube = function(query, callback) {
   };
 
   call(youtubeOptions, function(err, res) {
-    callback(err, JSON.parse(res));
+    if (err)
+      return callback(err);
+    
+    try {
+      return callback(undefined, JSON.parse(res));
+    } catch(error) {
+      return callback(error);
+    }
   });
 }
 
@@ -67,7 +74,14 @@ var getYoutubeVideoInfo = function(youtubeId, callback) {
   };
 
   call(youtubeOptions, function(err, res) {
-    callback(err, JSON.parse(res));
+    if (err)
+      return callback(err);
+    
+    try {
+      return callback(undefined, JSON.parse(res));
+    } catch(error) {
+      return callback(error);
+    }
   });
 }
 
