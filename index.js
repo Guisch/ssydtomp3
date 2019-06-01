@@ -20,6 +20,7 @@ const deezerTrackIdRegex = /deezer\.com\/track\/(\d{5,10})/i;
 const deezerPlaylistIdRegex = /deezer\.com\/.?.?\/?playlist\/(\d{5,15})/i;
 const spotifyTrackIdRegex = /(spotify:track:|open\.spotify\.com\/track\/)(\w{22})/i;
 const spotifyPlaylistIdRegex = /(spotify:user:|open\.spotify\.com\/user\/)(.*)(\/|:)playlist(\/|:)(\w{22})/i;
+const soundcloudRegex = /^(https?:\/\/)?(www.)?(m\.)?soundcloud\.com\/([\w\-\.]+(\/)+[\w\-\.]+)\/?$/i
 
 // Find info
 
@@ -902,6 +903,9 @@ var sanitizeUrl = function(url) {
 
   if (spotifyTrackIdRegex.test(url))
     return 'https://open.spotify.com/track/' + spotifyTrackIdRegex.exec(url)[2];
+  
+  if (soundcloudRegex.test(url))
+    return 'https://soundcloud.com/' + soundcloudRegex.exec(url)[4];
 
   if (spotifyPlaylistIdRegex.test(url)) {
     var temp = spotifyPlaylistIdRegex.exec(url);
